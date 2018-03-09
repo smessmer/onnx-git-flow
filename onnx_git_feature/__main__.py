@@ -8,7 +8,11 @@ from __future__ import unicode_literals
 import argparse
 import subprocess
 import re
-from typing import List, Text
+import sys
+print(sys.version_info)
+if sys.version_info.major != 3 or sys.version_info.minor != 5:
+    # Python 3.5 has issues with typing module
+    from typing import List, Text
 
 
 OFFICIAL_REPO_URL_PREFIXES = [

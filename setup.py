@@ -17,12 +17,14 @@ setup(name='onnx-git-feature',
       packages=find_packages(),
       entry_points={
         'console_scripts': [
-          'git-feature = git_feature:main'
+          'git-feature = onnx_git_feature.__main__:main'
         ],
       },
       install_requires=[
         'typing',
         'argparse',
+        'typing>=3.6.4',
+        'typing-extensions>=3.6.2.1',
       ],
       classifiers=[
         "Development Status :: 2 - Pre-Alpha",
