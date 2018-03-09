@@ -100,18 +100,24 @@ class GitFeatureApp(object):
 
     def _repo_setup_checks(self) -> None:
         remotes = subprocess.check_output(['git', 'remote', '-v']).decode('UTF-8').split('\n')
-        _check(_contains(remotes, "upstream\thttps://github\\.com/onnx/onnx(\\.git)? \\(fetch\\)\s*$") or
-                 _contains(remotes, "upstream\tgit@github\\.com:onnx/onnx(\\.git)? \\(fetch\\)\s*$"),
+        _check(_contains(remotes, "upstream\thttps://github\\.com/onnx/[a-zA-Z\\-]+(\\.git)? \\(fetch\\)\s*$") or
+                 _contains(remotes, "upstream\tgit@github\\.com:onnx/[a-zA-Z\\-]+(\\.git)? \\(fetch\\)\s*$"),
                "Remote repository 'upstream' not setup correctly")
-        _check(_contains(remotes, "upstream\thttps://github\\.com/onnx/onnx(\\.git)? \\(push\\)\s*$") or
-               _contains(remotes, "upstream\tgit@github\\.com:onnx/onnx(\\.git)? \\(push\\)\s*$"),
+        _check(_contains(remotes, "upstream\thttps://github\\.com/onnx/[a-zA-Z\\-]+(\\.git)? \\(push\\)\s*$") or
+               _contains(remotes, "upstream\tgit@github\\.com:onnx/[a-zA-Z\\-]+(\\.git)? \\(push\\)\s*$"),
                "Remote repository 'upstream' not setup correctly")
-        _check(_contains(remotes, "origin\thttps://github\\.com/[a-zA-Z\\-]+/onnx(\\.git)? \\(fetch\\)\s*$") or
-               _contains(remotes, "origin\tgit@github\\.com:[a-zA-Z\\-]+/onnx(\\.git)? \\(fetch\\)\s*$"),
+        _check(_contains(remotes, "origin\thttps://github\\.com/[a-zA-Z\\-]+/[a-zA-Z\\-]+(\\.git)? \\(fetch\\)\s*$") or
+               _contains(remotes, "origin\tgit@github\\.com:[a-zA-Z\\-]+/[a-zA-Z\\-]+(\\.git)? \\(fetch\\)\s*$"),
                "Remote repository 'origin' not setup correctly")
-        _check(_contains(remotes, "origin\thttps://github\\.com/[a-zA-Z\\-]+/onnx(\\.git)? \\(push\\)\s*$") or
-               _contains(remotes, "origin\tgit@github\\.com:[a-zA-Z\\-]+/onnx(\\.git)? \\(push\\)\s*$"),
+        _check(_contains(remotes, "origin\thttps://github\\.com/[a-zA-Z\\-]+/[a-zA-Z\\-]+(\\.git)? \\(push\\)\s*$") or
+               _contains(remotes, "origin\tgit@github\\.com:[a-zA-Z\\-]+/[a-zA-Z\\-]+(\\.git)? \\(push\\)\s*$"),
                "Remote repository 'origin' not setup correctly")
+        _check(not _contains(remotes, "origin\thttps://github\\.com/onnx/[a-zA-Z\\-]+(\\.git)? \\(fetch\\)\s*$") and
+               not _contains(remotes, "origin\tgit@github\\.com:onnx/[a-zA-Z\\-]+(\\.git)? \\(fetch\\)\s*$"),
+               "Remote repository 'origin' points to official sources. Please point it to your own fork.")
+        _check(not _contains(remotes, "origin\thttps://github\\.com/onnx/[a-zA-Z\\-]+(\\.git)? \\(push\\)\s*$") and
+               not _contains(remotes, "origin\tgit@github\\.com:onnx/[a-zA-Z\\-]+(\\.git)? \\(push\\)\s*$"),
+               "Remote repository 'origin' points to official sources. Please point it to your own fork.")
 
     def _create_feature_action(self) -> None:
         print('-----------------------------------------------------------')
