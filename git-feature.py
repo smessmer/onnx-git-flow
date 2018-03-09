@@ -6,6 +6,14 @@ import re
 from typing import List
 
 
+OFFICIAL_REPO_URL_PREFIXES = [
+    'https://github\\.com/onnx/',
+    'git@github\\.com:onnx/',
+    'https://github\\.com/caffe2/',
+    'git@github\\.com:caffe2/',
+]
+
+
 def _contains(list: List[str], regex: str) -> bool:
     matches = [item for item in list if re.match(regex, item)]
     return len(matches) > 0
@@ -100,24 +108,21 @@ class GitFeatureApp(object):
 
     def _repo_setup_checks(self) -> None:
         remotes = subprocess.check_output(['git', 'remote', '-v']).decode('UTF-8').split('\n')
-        _check(_contains(remotes, "upstream\thttps://github\\.com/onnx/[a-zA-Z\\-]+(\\.git)? \\(fetch\\)\s*$") or
-                 _contains(remotes, "upstream\tgit@github\\.com:onnx/[a-zA-Z\\-]+(\\.git)? \\(fetch\\)\s*$"),
-               "Remote repository 'upstream' not setup correctly")
-        _check(_contains(remotes, "upstream\thttps://github\\.com/onnx/[a-zA-Z\\-]+(\\.git)? \\(push\\)\s*$") or
-               _contains(remotes, "upstream\tgit@github\\.com:onnx/[a-zA-Z\\-]+(\\.git)? \\(push\\)\s*$"),
-               "Remote repository 'upstream' not setup correctly")
-        _check(_contains(remotes, "origin\thttps://github\\.com/[a-zA-Z\\-]+/[a-zA-Z\\-]+(\\.git)? \\(fetch\\)\s*$") or
-               _contains(remotes, "origin\tgit@github\\.com:[a-zA-Z\\-]+/[a-zA-Z\\-]+(\\.git)? \\(fetch\\)\s*$"),
-               "Remote repository 'origin' not setup correctly")
-        _check(_contains(remotes, "origin\thttps://github\\.com/[a-zA-Z\\-]+/[a-zA-Z\\-]+(\\.git)? \\(push\\)\s*$") or
-               _contains(remotes, "origin\tgit@github\\.com:[a-zA-Z\\-]+/[a-zA-Z\\-]+(\\.git)? \\(push\\)\s*$"),
-               "Remote repository 'origin' not setup correctly")
-        _check(not _contains(remotes, "origin\thttps://github\\.com/onnx/[a-zA-Z\\-]+(\\.git)? \\(fetch\\)\s*$") and
-               not _contains(remotes, "origin\tgit@github\\.com:onnx/[a-zA-Z\\-]+(\\.git)? \\(fetch\\)\s*$"),
-               "Remote repository 'origin' points to official sources. Please point it to your own fork.")
-        _check(not _contains(remotes, "origin\thttps://github\\.com/onnx/[a-zA-Z\\-]+(\\.git)? \\(push\\)\s*$") and
-               not _contains(remotes, "origin\tgit@github\\.com:onnx/[a-zA-Z\\-]+(\\.git)? \\(push\\)\s*$"),
-               "Remote repository 'origin' points to official sources. Please point it to your own fork.")
+        _check(any(
+            [_contains(remotes, "upstream\t%s[a-zA-Z0-9\\-]+(\\.git)? \\(fetch\\)\s*$" % url_prefix) for url_prefix in OFFICIAL_REPO_URL_PREFIXES]
+        ), "Remote repository 'upstream' not setup correctly (fetch)")
+        _check(any(
+            [_contains(remotes, "upstream\t%s[a-zA-Z0-9\\-]+(\\.git)? \\(push\\)\s*$" % url_prefix) for url_prefix in OFFICIAL_REPO_URL_PREFIXES]
+        ), "Remote repository 'upstream' not setup correctly (push)")
+        _check(_contains(remotes, "origin\thttps://github\\.com/[a-zA-Z0-9\\-]+/[a-zA-Z0-9\\-]+(\\.git)? \\(fetch\\)\s*$") or
+               _contains(remotes, "origin\tgit@github\\.com:[a-zA-Z0-9\\-]+/[a-zA-Z0-9\\-]+(\\.git)? \\(fetch\\)\s*$"),
+               "Remote repository 'origin' not setup correctly (fetch)")
+        _check(_contains(remotes, "origin\thttps://github\\.com/[a-zA-Z0-9\\-]+/[a-zA-Z0-9\\-]+(\\.git)? \\(push\\)\s*$") or
+               _contains(remotes, "origin\tgit@github\\.com:[a-zA-Z0-9\\-]+/[a-zA-Z0-9\\-]+(\\.git)? \\(push\\)\s*$"),
+               "Remote repository 'origin' not setup correctly (push)")
+        _check(not any(
+            [_contains(remotes, "origin\t%s[a-zA-Z0-9\\-]+(\\.git)? \\(fetch\\)\s*$" % url_prefix) for url_prefix in OFFICIAL_REPO_URL_PREFIXES]
+        ), "Remote repository 'origin' points to official repository. Please point it to your own fork.")
 
     def _create_feature_action(self) -> None:
         print('-----------------------------------------------------------')
