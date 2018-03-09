@@ -9,10 +9,17 @@ import argparse
 import subprocess
 import re
 import sys
+import os
 print(sys.version_info)
 if sys.version_info.major != 3 or sys.version_info.minor != 5:
     # Python 3.5 has issues with typing module
-    from typing import List, Text
+    from typing import List, Text, Union, IO, Any
+
+if sys.version_info[0] == 3:
+    DEVNULL = subprocess.DEVNULL  # type: Union[IO[Any], int]
+else:
+    # Python 2 doesn't have DEVNULL
+    DEVNULL = open(os.devnull, 'wb')
 
 
 OFFICIAL_REPO_URL_PREFIXES = [
@@ -39,7 +46,7 @@ def _remote_has_branch(remote, branch):  # type: (Text, Text) -> bool
 
 def _local_has_branch(branch):  # type: (Text) -> bool
     try:
-        subprocess.check_call(['git', 'rev-parse', '--verify', branch], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)  # type: ignore
+        subprocess.check_call(['git', 'rev-parse', '--verify', branch], stdout=DEVNULL, stderr=DEVNULL)  # type: ignore
         return True
     except subprocess.CalledProcessError:
         return False
