@@ -23,8 +23,8 @@ setup(name='onnx-git-feature',
       install_requires=[
         'typing',
         'argparse',
-        'typing>=3.6.4',
-        'typing-extensions>=3.6.2.1',
+        'typing',
+        'typing-extensions',
       ],
       classifiers=[
         "Development Status :: 2 - Pre-Alpha",
