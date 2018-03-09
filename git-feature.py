@@ -138,7 +138,7 @@ class GitFeatureApp(object):
             ['git', 'fetch', 'upstream'],
             ['git', 'checkout', self._feature_name],
             ['git', 'rebase', 'upstream/master'],
-            ['git', 'submodule', '--init', '--recursive'],
+            ['git', 'submodule', 'update', '--init', '--recursive'],
         ])
 
     def _remove_feature_action(self) -> None:
