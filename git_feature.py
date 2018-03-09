@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import argparse
 import subprocess
 import re
-from typing import List
+from typing import List, Text
 
 
 OFFICIAL_REPO_URL_PREFIXES = [
@@ -14,29 +19,29 @@ OFFICIAL_REPO_URL_PREFIXES = [
 ]
 
 
-def _contains(list: List[str], regex: str) -> bool:
+def _contains(list, regex):  # type: (List[Text], Text) -> bool
     matches = [item for item in list if re.match(regex, item)]
     return len(matches) > 0
 
 
-def _get_current_branch() -> str:
+def _get_current_branch():  # type: () -> Text
     return subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode('UTF-8').strip()
 
 
-def _remote_has_branch(remote: str, branch: str) -> bool:
+def _remote_has_branch(remote, branch):  # type: (Text, Text) -> bool
     output = subprocess.check_output(['git', 'ls-remote', '--heads', remote, branch]).decode('UTF-8').strip()
     return output != ''
 
 
-def _local_has_branch(branch: str) -> bool:
+def _local_has_branch(branch):  # type: (Text) -> bool
     try:
-        subprocess.check_call(['git', 'rev-parse', '--verify', branch], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.check_call(['git', 'rev-parse', '--verify', branch], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)  # type: ignore
         return True
     except subprocess.CalledProcessError:
         return False
 
 
-def _exec(commands: List[List[str]]) -> None:
+def _exec(commands):  # type: (List[List[Text]]) -> None
     print("# Will run command sequence:")
     for command in commands:
         print("# $> %s" % " ".join(command))
@@ -66,18 +71,18 @@ def _exec(commands: List[List[str]]) -> None:
             exit(1)
 
 
-def _error(message: str) -> None:
+def _error(message):  # type: (Text) -> None
     print("Error: %s" % message)
     exit(1)
 
 
-def _check(condition, message) -> None:
+def _check(condition, message):  # type: (bool, Text) -> None
     if not condition:
         _error(message)
 
 
 class GitFeatureApp(object):
-    def __init__(self) -> None:
+    def __init__(self):  # type: () -> None
         self._actions = {
             'create': self._create_feature_action,
             'rebase': self._rebase_feature_action,
@@ -86,7 +91,7 @@ class GitFeatureApp(object):
         }
         self._parse_args()
 
-    def _parse_args(self) -> None:
+    def _parse_args(self):  # type: () -> None
         parser = argparse.ArgumentParser(description="Create, rebase and delete git feature branches.",
             formatter_class=argparse.RawTextHelpFormatter,
             epilog=
@@ -102,11 +107,11 @@ class GitFeatureApp(object):
         self._action = self._actions[args.action]
         self._feature_name = args.feature_name
 
-    def run(self) -> None:
+    def run(self):  # type: () -> None
         self._repo_setup_checks()
         self._action()
 
-    def _repo_setup_checks(self) -> None:
+    def _repo_setup_checks(self):  # type: () -> None
         remotes = subprocess.check_output(['git', 'remote', '-v']).decode('UTF-8').split('\n')
         _check(any(
             [_contains(remotes, "upstream\t%s[a-zA-Z0-9\\-]+(\\.git)? \\(fetch\\)\s*$" % url_prefix) for url_prefix in OFFICIAL_REPO_URL_PREFIXES]
@@ -124,7 +129,7 @@ class GitFeatureApp(object):
             [_contains(remotes, "origin\t%s[a-zA-Z0-9\\-]+(\\.git)? \\(fetch\\)\s*$" % url_prefix) for url_prefix in OFFICIAL_REPO_URL_PREFIXES]
         ), "Remote repository 'origin' points to official repository. Please point it to your own fork.")
 
-    def _create_feature_action(self) -> None:
+    def _create_feature_action(self):  # type: () -> None
         print('-----------------------------------------------------------')
         print("Creating feature %s" % self._feature_name)
         print('-----------------------------------------------------------')
@@ -135,7 +140,7 @@ class GitFeatureApp(object):
             ['git', 'push', '--set-upstream', 'origin', self._feature_name],
         ])
 
-    def _rebase_feature_action(self) -> None:
+    def _rebase_feature_action(self):  # type: () -> None
         print('-----------------------------------------------------------')
         print("Rebasing feature %s on top of upstream/master" % self._feature_name)
         print('-----------------------------------------------------------')
@@ -146,7 +151,7 @@ class GitFeatureApp(object):
             ['git', 'submodule', 'update', '--init', '--recursive'],
         ])
 
-    def _remove_feature_action(self) -> None:
+    def _remove_feature_action(self):  # type: () -> None
         print('-----------------------------------------------------------')
         print("Removing feature %s" % self._feature_name)
         print('-----------------------------------------------------------')
@@ -161,7 +166,7 @@ class GitFeatureApp(object):
             _error("Branch '%s' not found, neither in local repository nor in 'origin' remote" % self._feature_name)
         _exec(commands)
 
-    def _push_feature_action(self) -> None:
+    def _push_feature_action(self):  # type: () -> None
         print('-----------------------------------------------------------')
         print("Pushing feature %s to origin" % self._feature_name)
         print('-----------------------------------------------------------')
@@ -170,7 +175,7 @@ class GitFeatureApp(object):
         ])
 
 
-def main() -> None:
+def main():  # type: () -> None
     app = GitFeatureApp()
     app.run()
 
