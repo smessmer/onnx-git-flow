@@ -12,7 +12,7 @@ or
 
 if you want to get updates.
 
-# Usage:
+# Usage
 
 Create and check out new feature 'myfeature'
 
