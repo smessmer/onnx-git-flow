@@ -27,6 +27,8 @@ OFFICIAL_REPO_URL_PREFIXES = [
     'git@github\\.com:onnx/',
     'https://github\\.com/caffe2/',
     'git@github\\.com:caffe2/',
+    'https://github\\.com/pytorch/',
+    'git@github\\.com:pytorch/',
 ]
 
 
@@ -147,6 +149,7 @@ class GitFeatureApp(object):
         _exec([
             ['git', 'fetch', 'upstream'],
             ['git', 'checkout', '-b', self._feature_name, 'upstream/master', '--no-track'],
+            ['git', 'submodule', 'foreach', 'git', 'fetch', '--all'],
             ['git', 'submodule', 'update', '--init', '--recursive'],
             ['git', 'push', '--set-upstream', 'origin', self._feature_name],
         ])
@@ -159,6 +162,7 @@ class GitFeatureApp(object):
             ['git', 'fetch', 'upstream'],
             ['git', 'checkout', self._feature_name],
             ['git', 'rebase', 'upstream/master'],
+            ['git', 'submodule', 'foreach', 'git', 'fetch', '--all'],
             ['git', 'submodule', 'update', '--init', '--recursive'],
         ])
 
