@@ -9,7 +9,7 @@ from setuptools import setup, find_packages, Command
 
 setup(name='git-feature',
       version='0.1.0',
-      description='Handle feature branches for onnx and caffe2 repositories',
+      description='Handle feature branches for onnx and pytorch repositories',
       author='Sebastian Messmer',
       author_email='messmer@fb.com',
       license='GPLv3',
