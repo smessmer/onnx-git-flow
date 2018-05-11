@@ -7,7 +7,7 @@ import os
 from setuptools import setup, find_packages, Command
 
 
-setup(name='onnx-git-feature',
+setup(name='git-feature',
       version='0.1.0',
       description='Handle feature branches for onnx and caffe2 repositories',
       author='Sebastian Messmer',
