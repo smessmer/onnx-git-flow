@@ -98,6 +98,7 @@ class GitFeatureApp(object):
     def __init__(self):  # type: () -> None
         self._actions = {
             'create': self._create_feature_action,
+            'checkout': self._checkout_feature_action,
             'rebase': self._rebase_feature_action,
             'push': self._push_feature_action,
             'remove': self._remove_feature_action,
@@ -110,6 +111,7 @@ class GitFeatureApp(object):
             epilog=
             "Examples:\n" +
             "  $> git-feature create myfeature   # Creates and checks out new feature 'myfeature'\n" +
+            "  $> git-feature checkout myfeature # Checks out existing local feature 'myfeature'\n" +
             "  $> git-feature rebase myfeature   # Rebases 'myfeature' on top of current upstream/master\n" +
             "  $> git-feature push myfeature     # Pushes 'myfeature' to origin for creation of a pull request\n" +
             "  $> git-feature remove myfeature   # Removes 'myfeature' from local and 'origin' remote\n")
@@ -152,6 +154,16 @@ class GitFeatureApp(object):
             ['git', 'submodule', 'foreach', 'git', 'fetch', '--all'],
             ['git', 'submodule', 'update', '--init', '--recursive'],
             ['git', 'push', '--set-upstream', 'origin', self._feature_name],
+        ])
+
+    def _checkout_feature_action(self):  # type: () -> None
+        print('-----------------------------------------------------------')
+        print("Checking out feature %s" % self._feature_name)
+        print('-----------------------------------------------------------')
+        _exec([
+            ['git', 'checkout', self._feature_name],
+            ['git', 'submodule', 'foreach', 'git', 'fetch', '--all'],
+            ['git', 'submodule', 'update', '--init', '--recursive'],
         ])
 
     def _rebase_feature_action(self):  # type: () -> None
