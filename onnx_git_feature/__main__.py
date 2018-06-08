@@ -162,7 +162,6 @@ class GitFeatureApp(object):
         print('-----------------------------------------------------------')
         _exec([
             ['git', 'checkout', self._feature_name],
-            ['git', 'submodule', 'foreach', 'git', 'fetch', '--all'],
             ['git', 'submodule', 'update', '--init', '--recursive'],
         ])
 
